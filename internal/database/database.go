@@ -1,12 +1,12 @@
 package database
 
 import (
-"fmt"
-"log"
+	"fmt"
+	"log"
 
-"github.com/nashirabbash/backend-pfd/internal/config"
-"gorm.io/driver/postgres"
-"gorm.io/gorm"
+	"github.com/nashirabbash/backend-pfd/internal/config"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 var DB *gorm.DB

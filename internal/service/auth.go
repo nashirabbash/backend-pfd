@@ -1,15 +1,14 @@
 package service
 
 import (
-"crypto/sha256"
-"encoding/hex"
-"errors"
+	"errors"
 
-"github.com/nashirabbash/backend-pfd/internal/dto"
-"github.com/nashirabbash/backend-pfd/internal/middleware"
-"github.com/nashirabbash/backend-pfd/internal/model"
-"github.com/nashirabbash/backend-pfd/internal/repository"
-"gorm.io/gorm"
+	"github.com/nashirabbash/backend-pfd/internal/dto"
+	"github.com/nashirabbash/backend-pfd/internal/middleware"
+	"github.com/nashirabbash/backend-pfd/internal/model"
+	"github.com/nashirabbash/backend-pfd/internal/repository"
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 type AuthService struct {
@@ -21,12 +20,19 @@ func NewAuthService(userRepo *repository.UserRepository) *AuthService {
 }
 
 func (s *AuthService) Register(req *dto.RegisterRequest) (*dto.AuthResponse, error) {
-	existingUser, _ := s.userRepo.FindByEmail(req.Email)
+	existingUser, err := s.userRepo.FindByEmail(req.Email)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+
 	if existingUser != nil {
 		return nil, errors.New("email already registered")
 	}
 
-	hashedPassword := hashPassword(req.Password)
+	hashedPassword, err := hashPassword(req.Password)
+	if err != nil {
+		return nil, err
+	}
 
 	user := &model.User{
 		Email:    req.Email,
@@ -62,7 +68,7 @@ func (s *AuthService) Login(req *dto.LoginRequest) (*dto.AuthResponse, error) {
 		return nil, err
 	}
 
-	if !verifyPassword(user.Password, req.Password) {
+	if err := verifyPassword(user.Password, req.Password); err != nil {
 		return nil, errors.New("invalid email or password")
 	}
 
@@ -81,12 +87,15 @@ func (s *AuthService) Login(req *dto.LoginRequest) (*dto.AuthResponse, error) {
 	}, nil
 }
 
-func hashPassword(password string) string {
-	hash := sha256.Sum256([]byte(password))
-	return hex.EncodeToString(hash[:])
+func hashPassword(password string) (string, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+
+	return string(hash), nil
 }
 
-func verifyPassword(hashedPassword, password string) bool {
-	hash := sha256.Sum256([]byte(password))
-	return hex.EncodeToString(hash[:]) == hashedPassword
+func verifyPassword(hashedPassword, password string) error {
+	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }

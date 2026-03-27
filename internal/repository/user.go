@@ -1,8 +1,8 @@
 package repository
 
 import (
-"github.com/nashirabbash/backend-pfd/internal/model"
-"gorm.io/gorm"
+	"github.com/nashirabbash/backend-pfd/internal/model"
+	"gorm.io/gorm"
 )
 
 type UserRepository struct {

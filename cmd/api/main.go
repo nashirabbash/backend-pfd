@@ -1,14 +1,14 @@
 package main
 
 import (
-"log"
+	"log"
 
-"github.com/gofiber/fiber/v2"
-"github.com/gofiber/fiber/v2/middleware/cors"
-"github.com/gofiber/fiber/v2/middleware/logger"
-"github.com/nashirabbash/backend-pfd/internal/config"
-"github.com/nashirabbash/backend-pfd/internal/database"
-"github.com/nashirabbash/backend-pfd/internal/route"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/nashirabbash/backend-pfd/internal/config"
+	"github.com/nashirabbash/backend-pfd/internal/database"
+	"github.com/nashirabbash/backend-pfd/internal/route"
 )
 
 func main() {
@@ -32,16 +32,16 @@ func main() {
 
 	log.Println("🚀 Creating Fiber application...")
 	app := fiber.New(fiber.Config{
-AppName: "PFD Backend API v1.0.0",
-})
+		AppName: "PFD Backend API v1.0.0",
+	})
 
 	log.Println("⚙️  Registering middleware...")
 	app.Use(logger.New())
 	app.Use(cors.New(cors.Config{
-AllowOrigins: "*",
-AllowMethods: "GET,POST,PUT,DELETE,PATCH,OPTIONS",
-AllowHeaders: "Content-Type,Authorization",
-}))
+		AllowOrigins: "*",
+		AllowMethods: "GET,POST,PUT,DELETE,PATCH,OPTIONS",
+		AllowHeaders: "Content-Type,Authorization",
+	}))
 
 	log.Println("🛣️  Setting up routes...")
 	route.SetupRoutes(app)

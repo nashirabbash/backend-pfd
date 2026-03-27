@@ -1,16 +1,16 @@
 package handler
 
 import (
-"fmt"
-"log"
+	"fmt"
+	"log"
 
-"github.com/gofiber/contrib/websocket"
-"github.com/gofiber/fiber/v2"
-"github.com/nashirabbash/backend-pfd/internal/database"
-"github.com/nashirabbash/backend-pfd/internal/dto"
-"github.com/nashirabbash/backend-pfd/internal/middleware"
-"github.com/nashirabbash/backend-pfd/internal/repository"
-"github.com/nashirabbash/backend-pfd/internal/service"
+	"github.com/gofiber/contrib/websocket"
+	"github.com/gofiber/fiber/v2"
+	"github.com/nashirabbash/backend-pfd/internal/database"
+	"github.com/nashirabbash/backend-pfd/internal/dto"
+	"github.com/nashirabbash/backend-pfd/internal/middleware"
+	"github.com/nashirabbash/backend-pfd/internal/repository"
+	"github.com/nashirabbash/backend-pfd/internal/service"
 )
 
 type AuthHandler struct {
@@ -32,7 +32,7 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 	resp, err := h.authService.Register(&req)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-"error": err.Error(),
+			"error": err.Error(),
 		})
 	}
 
@@ -48,11 +48,21 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	resp, err := h.authService.Login(&req)
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-"error": err.Error(),
+			"error": err.Error(),
 		})
 	}
 
 	return c.Status(fiber.StatusOK).JSON(resp)
+}
+
+func (h *AuthHandler) Me(c *fiber.Ctx) error {
+	userID := c.Locals("user_id")
+	email := c.Locals("email")
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"user_id": userID,
+		"email":   email,
+	})
 }
 
 func WebSocketHandler(c *websocket.Conn) {

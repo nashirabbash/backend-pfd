@@ -56,7 +56,7 @@ pfd-be/
 │   │   └── validator.go            # Validation middleware
 │   └── route/
 │       └── routes.go               # Route definitions
-├── .env                            # Environment variables
+├── .env.example                    # Environment variables template
 ├── go.mod                          # Module definition
 ├── go.sum                          # Dependency checksums
 └── README.md                       # This file
@@ -73,20 +73,17 @@ pfd-be/
 
 1. **Clone the repository**
    ```bash
-   cd /home/broo/Documents/pfd-be
+  git clone <your-repo-url>
+  cd pfd-be
    ```
 
 2. **Configure environment variables**
-   Edit `.env` file with your PostgreSQL credentials:
+  Copy `.env.example` to `.env`, then adjust values:
    ```env
-   DB_HOST=localhost
-   DB_PORT=5432
-   DB_USER=postgres
-   DB_PASSWORD=postgres
-   DB_NAME=pfd_db
+  DATABASE_URL=postgres://postgres:postgres@localhost:5432/pfd_db?sslmode=disable
    PORT=3000
    ENV=development
-   JWT_SECRET=your-secret-key-change-this-in-production
+  JWT_SECRET=change-this-secret
    JWT_EXPIRATION=24
    ```
 
@@ -148,6 +145,18 @@ Response: 200 OK
     "email": "user@example.com",
     "name": "John Doe"
   }
+}
+```
+
+#### Get Current User (Protected)
+```
+GET /api/auth/me
+Authorization: Bearer <your_token_here>
+
+Response: 200 OK
+{
+  "user_id": 1,
+  "email": "user@example.com"
 }
 ```
 
@@ -222,7 +231,7 @@ wscat -c ws://localhost:3000/ws
 - [x] Database PostgreSQL connection successful
 - [x] `POST /api/auth/register` returns JWT token
 - [x] `POST /api/auth/login` returns JWT token
-- [x] Protected routes reject requests without valid token (401)
+- [x] Protected route `GET /api/auth/me` rejects requests without valid token (401)
 - [x] WebSocket endpoint (`/ws`) establishes connection
 - [x] WebSocket sends echo response to messages
 - [x] Health check endpoint works (`/health`)

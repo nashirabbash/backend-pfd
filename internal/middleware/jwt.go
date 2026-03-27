@@ -1,13 +1,13 @@
 package middleware
 
 import (
-"fmt"
-"strconv"
-"strings"
-"time"
+	"fmt"
+	"strconv"
+	"strings"
+	"time"
 
-"github.com/golang-jwt/jwt/v5"
-"github.com/nashirabbash/backend-pfd/internal/config"
+	"github.com/golang-jwt/jwt/v5"
+	"github.com/nashirabbash/backend-pfd/internal/config"
 )
 
 type Claims struct {
@@ -21,7 +21,10 @@ func GenerateToken(userID uint, email string) (string, error) {
 		return "", fmt.Errorf("config not initialized")
 	}
 
-	expirationHours, _ := strconv.Atoi(config.AppConfig.JWTExpiration)
+	expirationHours, err := strconv.Atoi(config.AppConfig.JWTExpiration)
+	if err != nil || expirationHours <= 0 {
+		expirationHours = 24
+	}
 
 	claims := &Claims{
 		UserID: userID,
@@ -48,7 +51,7 @@ func ValidateToken(tokenString string) (*Claims, error) {
 
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 		return []byte(config.AppConfig.JWTSecret), nil

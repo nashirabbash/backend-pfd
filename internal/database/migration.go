@@ -1,18 +1,19 @@
 package database
 
 import (
-"log"
+	"fmt"
+	"log"
 
-"github.com/nashirabbash/backend-pfd/internal/model"
+	"github.com/nashirabbash/backend-pfd/internal/model"
 )
 
 func AutoMigrate() error {
 	if DB == nil {
-		return nil
+		return fmt.Errorf("database is not initialized")
 	}
 
 	err := DB.AutoMigrate(
-&model.User{},
+		&model.User{},
 	)
 
 	if err != nil {
